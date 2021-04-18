@@ -36,6 +36,7 @@ import java.util.List;
 public class Chat extends AppCompatActivity {
     private ListView listView2;
     private ArrayAdapter<UserChat> adapter2;
+    private List<UserChat> listTemp;
     private DatabaseReference mDataBase2;
     private DatabaseReference mDataBase3;
 
@@ -50,6 +51,7 @@ public class Chat extends AppCompatActivity {
         listView2 = findViewById(R.id.listView2);
         ArrayList<PersonChat> listData2 = new ArrayList<>();
         PersonChatAdapter adapter2 = new PersonChatAdapter(this, R.layout.chat_row, listData2);
+        listTemp = new ArrayList<>();
         listView2.setAdapter(adapter2);
         mDataBase2 = FirebaseDatabase.getInstance().getReference(MainActivity4.USER_KEY).child("chat").child(MainActivity4.name);
         mDataBase3 = FirebaseDatabase.getInstance().getReference(MainActivity4.name).child("chat").child(MainActivity4.USER_KEY);
@@ -59,11 +61,13 @@ public class Chat extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
                 if(listData2.size() > 0)listData2.clear();
+                if (listTemp.size() > 0) listTemp.clear();
                 for(DataSnapshot ds : dataSnapshot.getChildren())
                 {
                     UserChat userChat = ds.getValue(UserChat.class);
                     assert userChat != null;
                     listData2.add(new PersonChat(R.drawable.ic_launcher_background, userChat.name, userChat.message));
+                    listTemp.add(userChat);
                 }
                 adapter2.notifyDataSetChanged();
             }
@@ -73,7 +77,6 @@ public class Chat extends AppCompatActivity {
             }
         };
         mDataBase2.addValueEventListener(vListener);
-        //mDataBase3.addValueEventListener(vListener);
 
         editText2 = findViewById(R.id.editText2);
         button2 = findViewById(R.id.button2);
@@ -87,7 +90,64 @@ public class Chat extends AppCompatActivity {
                 editText2.setText("");
             }
         });
+
+        listView2.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                new AlertDialog.Builder(Chat.this)
+                        .setTitle("Удалить сообщение?")
+                        .setMessage("Вы хотите удалить это сообщение?")
+                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                final UserChat userChat = listTemp.get(position);
+
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference(MainActivity4.USER_KEY);
+                                Query query = ref.child("chat").child(MainActivity4.name).orderByChild("message").equalTo(userChat.message);
+
+                                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                            appleSnapshot.getRef().removeValue();
+
+                                            if(MainActivity4.USER_KEY.equals(userChat.name)){
+                                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference(MainActivity4.name);
+                                                Query query = ref.child("chat").child(MainActivity4.USER_KEY).orderByChild("message").equalTo(userChat.message);
+
+                                                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                                            appleSnapshot.getRef().removeValue();
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+
+                                                    }
+                                                });
+                                            }
+                                            Toast.makeText(Chat.this, "Сообщение удалено", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("Нет", null)
+                        .show();
+                return true;
+            }
+        });
     }
+
     private class PersonChatAdapter extends ArrayAdapter<PersonChat>{
         private Context mContext;
         private int mResource;

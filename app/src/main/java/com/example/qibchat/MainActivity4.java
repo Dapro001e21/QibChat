@@ -124,15 +124,12 @@ public class MainActivity4 extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                final int which_item = position;
-
                 new AlertDialog.Builder(MainActivity4.this)
                         .setTitle("Удалить чат?")
                         .setMessage("Вы хотите удалить этот чат?")
                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                User user = listTemp.get(which_item);
                                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference(USER_KEY);
                                 Query query = ref.child("key").orderByChild("name").equalTo(user.name);
 
