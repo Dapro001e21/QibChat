@@ -15,10 +15,10 @@
         <activity android:name=".StartActivity" />
         <activity android:name=".Chat" />
         <activity android:name=".CreatChat" />
-        <activity android:name=".MainActivity4" />
-        <activity android:name=".MainActivity3" />
-        <activity android:name=".MainActivity2" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".ChatsScreen" />
+        <activity android:name=".AuthenticationNameScreen" />
+        <activity android:name=".AuthenticationScreen" />
+        <activity android:name=".LoadingScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -18,9 +18,9 @@ public class StartActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(StartActivity.this,MainActivity2.class);
+                Intent intent = new Intent(StartActivity.this, AuthenticationScreen.class);
                 startActivity(intent);
-                MainActivity2.x = false;
+                AuthenticationScreen.x = false;
                 finish();
             }
         });

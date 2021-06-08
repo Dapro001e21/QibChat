@@ -23,7 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity2 extends AppCompatActivity {
+public class AuthenticationScreen extends AppCompatActivity {
     private EditText text_mail, text_password;
     private Button button, button2;
     private FirebaseAuth mAuth;
@@ -56,7 +56,7 @@ public class MainActivity2 extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "User SignUp Successful ", Toast.LENGTH_SHORT).show();
                                 email = text_mail.getText().toString();
                                 save();
-                                Intent intent = new Intent(MainActivity2.this, MainActivity3.class);
+                                Intent intent = new Intent(AuthenticationScreen.this, AuthenticationNameScreen.class);
                                 startActivity(intent);
                                 finish();
                             } else {
@@ -84,8 +84,8 @@ public class MainActivity2 extends AppCompatActivity {
 
                                 String text = email = email.replace(".", "");
 
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference(text).child("email");
-                                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference(text).child("name");
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("UsersGmail").child(text).child("email");
+                                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference("UsersGmail").child(text).child("name");
 
                                 ValueEventListener vListener2 = new ValueEventListener() {
                                     @Override
@@ -100,8 +100,8 @@ public class MainActivity2 extends AppCompatActivity {
                                                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                                                             String str = ds.getValue(String.class);
                                                             assert str != null;
-                                                            MainActivity3.USER_KEY = str;
-                                                            Intent intent = new Intent(MainActivity2.this,MainActivity3.class);
+                                                            AuthenticationNameScreen.USER_KEY = str;
+                                                            Intent intent = new Intent(AuthenticationScreen.this, AuthenticationNameScreen.class);
                                                             startActivity(intent);
                                                             finish();
                                                         }
@@ -141,12 +141,12 @@ public class MainActivity2 extends AppCompatActivity {
         super.onStart();
         cUser = mAuth.getCurrentUser();
         if (cUser != null) {
-            Intent intent = new Intent(MainActivity2.this, MainActivity3.class);
+            Intent intent = new Intent(AuthenticationScreen.this, AuthenticationNameScreen.class);
             startActivity(intent);
             finish();
         } else {
             if (x){
-                Intent intent = new Intent(MainActivity2.this, StartActivity.class);
+                Intent intent = new Intent(AuthenticationScreen.this, StartActivity.class);
                 startActivity(intent);
                 finish();
             }

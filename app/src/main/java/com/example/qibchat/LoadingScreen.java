@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class LoadingScreen extends AppCompatActivity {
 
     ConnectionDetector cd;
 
@@ -21,11 +21,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (cd.isConnected()){
-                    Intent intent = new Intent(MainActivity.this,MainActivity2.class);
+                    Intent intent = new Intent(LoadingScreen.this, AuthenticationScreen.class);
                     startActivity(intent);
                     finish();
                 }else{
-                    Toast.makeText(MainActivity.this,"Нет подключения к интернету",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoadingScreen.this,"Нет подключения к интернету",Toast.LENGTH_SHORT).show();
                 }
             }
         }, 5 * 1000);

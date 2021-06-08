@@ -35,23 +35,23 @@ public class CreatChat extends AppCompatActivity {
             public void onClick(View v) {
                 String name = edName.getText().toString();
                 User newUser = new User(name);
-                String name2 = MainActivity4.USER_KEY;
-                User2 newUser2 = new User2(name2);
+                String name2 = ChatsScreen.USER_KEY;
+                User newUser2 = new User(name2);
                 if(!TextUtils.isEmpty(name))
                 {
                     UserChat userChat = new UserChat("QibChat", "Chat Создан");
-                    mDataBase = FirebaseDatabase.getInstance().getReference(MainActivity4.USER_KEY).child("key");
+                    mDataBase = FirebaseDatabase.getInstance().getReference("Users").child(ChatsScreen.USER_KEY).child("key");
                     mDataBase.push().setValue(newUser);
-                    mDataBase2 = FirebaseDatabase.getInstance().getReference(MainActivity4.USER_KEY).child("chat").child(name);
+                    mDataBase2 = FirebaseDatabase.getInstance().getReference("Users").child(ChatsScreen.USER_KEY).child("chat").child(name);
                     mDataBase2.push().setValue(userChat);
 
-                    mDataBase3 = FirebaseDatabase.getInstance().getReference(name).child("key");
+                    mDataBase3 = FirebaseDatabase.getInstance().getReference("Users").child(name).child("key");
                     mDataBase3.push().setValue(newUser2);
-                    mDataBase4 = FirebaseDatabase.getInstance().getReference(name).child("chat").child(MainActivity4.USER_KEY);
+                    mDataBase4 = FirebaseDatabase.getInstance().getReference("Users").child(name).child("chat").child(ChatsScreen.USER_KEY);
                     mDataBase4.push().setValue(userChat);
 
                     Toast.makeText(getApplicationContext(), "Чат создан", Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(CreatChat.this, MainActivity4.class);
+                    Intent i = new Intent(CreatChat.this, ChatsScreen.class);
                     startActivity(i);
                 }
                 else

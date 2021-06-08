@@ -3,20 +3,15 @@ package com.example.qibchat;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.service.autofill.UserData;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,17 +20,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationMenu;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -48,9 +40,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Transformation;
-
-import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -58,7 +47,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity4 extends AppCompatActivity {
+public class ChatsScreen extends AppCompatActivity {
     private ListView listView;
     private List<User> listTemp;
 
@@ -77,7 +66,7 @@ public class MainActivity4 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main4);
 
-        USER_KEY = MainActivity3.USER_KEY;
+        USER_KEY = AuthenticationNameScreen.USER_KEY;
         mStorageRef = FirebaseStorage.getInstance().getReference("ImageDB");
 
         listView = findViewById(R.id.listView);
@@ -85,7 +74,7 @@ public class MainActivity4 extends AppCompatActivity {
         PersonAdapter personAdapter = new PersonAdapter(this, R.layout.list_row, listData);
         listTemp = new ArrayList<>();
         listView.setAdapter(personAdapter);
-        mDataBase = FirebaseDatabase.getInstance().getReference(USER_KEY).child("key");
+        mDataBase = FirebaseDatabase.getInstance().getReference("Users").child(USER_KEY).child("key");
 
         ValueEventListener vListener = new ValueEventListener() {
             @Override
@@ -114,7 +103,7 @@ public class MainActivity4 extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 user = listTemp.get(position);
-                Intent i = new Intent(MainActivity4.this, Chat.class);
+                Intent i = new Intent(ChatsScreen.this, Chat.class);
                 name = user.name;
                 startActivity(i);
             }
@@ -124,13 +113,13 @@ public class MainActivity4 extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-                new AlertDialog.Builder(MainActivity4.this)
+                new AlertDialog.Builder(ChatsScreen.this)
                         .setTitle("Удалить чат?")
                         .setMessage("Вы хотите удалить этот чат?")
                         .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference(USER_KEY);
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(USER_KEY);
                                 Query query = ref.child("key").orderByChild("name").equalTo(user.name);
 
                                 query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -138,9 +127,9 @@ public class MainActivity4 extends AppCompatActivity {
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
                                             appleSnapshot.getRef().removeValue();
-                                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(MainActivity4.USER_KEY).child("chat").child(user.name);
+                                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(ChatsScreen.USER_KEY).child("chat").child(user.name);
                                             ref.removeValue();
-                                            Toast.makeText(MainActivity4.this, "Чат удален", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(ChatsScreen.this, "Чат удален", Toast.LENGTH_SHORT).show();
                                         }
                                     }
 
@@ -186,6 +175,7 @@ public class MainActivity4 extends AppCompatActivity {
             imageProfile.setImageURI(uri);
             uploadImage();
         }
+
     }
 
     private void uploadImage(){
@@ -204,7 +194,7 @@ public class MainActivity4 extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
                 uploadUri = task.getResult();
-                DatabaseReference mRef2 = FirebaseDatabase.getInstance().getReference(USER_KEY).child("image").child("image");
+                DatabaseReference mRef2 = FirebaseDatabase.getInstance().getReference("Users").child(USER_KEY).child("image").child("image");
                 mRef2.setValue(uploadUri.toString());
             }
         });
@@ -212,7 +202,7 @@ public class MainActivity4 extends AppCompatActivity {
     }
 
     private void downloadImage() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(USER_KEY).child("image");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(USER_KEY).child("image");
         ValueEventListener vListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
@@ -259,13 +249,13 @@ public class MainActivity4 extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.Create_group:
-                Intent create = new Intent(MainActivity4.this, CreatChat.class);
+                Intent create = new Intent(ChatsScreen.this, CreatChat.class);
                 startActivity(create);
                 break;
             case R.id.leave:
                 FirebaseAuth.getInstance().signOut();
                 leave = true;
-                Intent leave = new Intent(MainActivity4.this, MainActivity3.class);
+                Intent leave = new Intent(ChatsScreen.this, AuthenticationNameScreen.class);
                 startActivity(leave);
                 break;
         }
@@ -305,7 +295,7 @@ public class MainActivity4 extends AppCompatActivity {
             ImageView imageView = convertView.findViewById(R.id.imageName);
             TextView txtName = convertView.findViewById(R.id.txtName);
 
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(getItem(position).getName()).child("image");
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(getItem(position).getName()).child("image");
             ValueEventListener vListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot)

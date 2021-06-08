@@ -1,6 +1,5 @@
 package com.example.qibchat;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -13,15 +12,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Random;
 
-public class MainActivity3 extends AppCompatActivity {
+public class AuthenticationNameScreen extends AppCompatActivity {
     TextView textView;
     Button button;
     EditText editText;
@@ -36,13 +32,13 @@ public class MainActivity3 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
 
-        if (MainActivity4.leave){
+        if (ChatsScreen.leave){
             USER_KEY = null;
             name = null;
             rand = null;
-            MainActivity4.leave = false;
+            ChatsScreen.leave = false;
             save();
-            Intent intent = new Intent(MainActivity3.this,MainActivity2.class);
+            Intent intent = new Intent(AuthenticationNameScreen.this, AuthenticationScreen.class);
             startActivity(intent);
             finish();
         }
@@ -54,7 +50,7 @@ public class MainActivity3 extends AppCompatActivity {
 
         if (USER_KEY != null){
             save();
-            Intent intent = new Intent(MainActivity3.this,MainActivity4.class);
+            Intent intent = new Intent(AuthenticationNameScreen.this, ChatsScreen.class);
             startActivity(intent);
             finish();
         }else {
@@ -72,12 +68,12 @@ public class MainActivity3 extends AppCompatActivity {
                         name = editText.getText().toString();
                         USER_KEY = name + "" + rand;
                         save();
-                        String text = MainActivity2.email = MainActivity2.email.replace(".", "");
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(text).child("email");
+                        String text = AuthenticationScreen.email = AuthenticationScreen.email.replace(".", "");
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("UsersGmail").child(text).child("email");
                         ref.push().setValue(text);
-                        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference(text).child("name");
+                        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference("UsersGmail").child(text).child("name");
                         ref2.push().setValue(USER_KEY);
-                        Intent intent = new Intent(MainActivity3.this,MainActivity4.class);
+                        Intent intent = new Intent(AuthenticationNameScreen.this, ChatsScreen.class);
                         startActivity(intent);
                         finish();
                     }
